@@ -106,7 +106,7 @@ class crossrod:
         self.J[2,2,:] = density * self.I[2,2,:]
 
         # kappa here
-        self.kappa = 0
+        self.kappa = 0 # This has to be something, look to Evan for answer
 
         # shear/stress strain
         self.sigma = self.dil_fac * self.tangents - self.directors[2,:,:]
@@ -159,7 +159,7 @@ class crossrod:
         self.update(temp_pos)
 
         matmul = np.zeros((3,self.e))
-        matmul = np.einsum('jil, jkl, kl -> il ', Q.T, S, sigma)
+        matmul = np.einsum('jil, jkl, kl -> il ', Q.T, self.S_hat, self.sigma)
 
         self.internal_force = grad_h(matmul / self.dil_fac, self.n)
 
