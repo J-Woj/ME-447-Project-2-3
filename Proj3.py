@@ -157,9 +157,9 @@ def plot_timoshenko(rod_1, rod_2, rod_3, rod_4, end_force_1, end_force_2, end_fo
     )
 
     ax.legend(prop={"size": 8})
-    ax.set_zlabel("Z Position (m)", fontsize=8)
-    ax.set_ylabel("Y Position (m)", fontsize=8)
-    ax.set_xlabel("X Position (m)", fontsize=8)
+    ax.set_zlabel("Z Position (m)", fontsize=12)
+    ax.set_ylabel("Y Position (m)", fontsize=12)
+    ax.set_xlabel("X Position (m)", fontsize=12)
     plt.show()
 
 plot_timoshenko(rod_1, rod_2, rod_3, rod_4, end_force_1, end_force_2, end_force_3, end_force_4)
