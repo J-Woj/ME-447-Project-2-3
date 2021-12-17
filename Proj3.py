@@ -18,7 +18,7 @@ shear_modulus = E / (poisson_ratio + 1.0)
 start = np.zeros((3,))
 direction = np.array([0.0, 0.0, 1.0])
 normal = np.array([0.0, 1.0, 0.0])
-base_length = 4.0
+base_length = 4
 base_radius = 0.25
 base_area = np.pi * base_radius ** 2
 
@@ -32,7 +32,7 @@ rod_1 = CosseratRod.straight_rod(
     density,
     nu,
     E,
-    shear_modulus = shear_modulus,
+    shear_modulus,
 )
 
 timoshenko_sim.append(rod_1)
@@ -40,17 +40,18 @@ timoshenko_sim.constrain(rod_1).using(
     OneEndFixedRod, constrained_position_idx=(0,), constrained_director_idx=(0,)
 )
 
+
 rod_2 = CosseratRod.straight_rod(
     50,
     start,
     direction,
     normal,
-    2.0,
+    2,
     base_radius,
     density,
     nu,
     E,
-    shear_modulus = shear_modulus,
+    shear_modulus,
 )
 
 timoshenko_sim.append(rod_2)
@@ -58,9 +59,30 @@ timoshenko_sim.constrain(rod_2).using(
     OneEndFixedRod, constrained_position_idx=(0,), constrained_director_idx=(0,)
 )
 
+# rod_3 = CosseratRod.straight_rod(
+#     n_elem,
+#     start,
+#     direction,
+#     normal,
+#     base_length,
+#     base_radius,
+#     density,
+#     nu,
+#     E,
+#     shear_modulus,
+# )
+
+# timoshenko_sim.append(rod_3)
+# timoshenko_sim.constrain(rod_3).using(
+#     OneEndFixedRod, constrained_position_idx=(0,), constrained_director_idx=(0,)
+# )
+
+
 origin_force = np.array([0.0, 0.0, 0.0])
-end_force_1 = np.array([3.16422, 0.0, 0.0])
-end_force_2 = np.array([-10, 0.0, 0.0])
+end_force_1 = np.array([3.1, 0.0, 0.0])
+end_force_2 = np.array([-10.0, 0.0, 0.0])
+# end_force_3 = np.array([1.0, 0.0, 0.0])
+# end_force_4 = np.array([-50.0,0.0,0.0])
 ramp_up_time = 5.0
 
 timoshenko_sim.add_forcing_to(rod_1).using(
@@ -70,6 +92,32 @@ timoshenko_sim.add_forcing_to(rod_1).using(
 timoshenko_sim.add_forcing_to(rod_2).using(
     EndpointForces, origin_force, end_force_2, ramp_up_time=ramp_up_time
 )
+
+# timoshenko_sim.add_forcing_to(rod_3).using(
+#     EndpointForces, origin_force, end_force_3, ramp_up_time=ramp_up_time
+# )
+
+# start_4 = start + direction * base_length
+# print(start_4)
+# rod_4 = CosseratRod.straight_rod(
+#     50,
+#     start_4,
+#     direction,
+#     normal,
+#     2,
+#     base_radius,
+#     density,
+#     nu,
+#     E,
+#     shear_modulus = shear_modulus,
+# )
+
+# timoshenko_sim.append(rod_4)
+# timoshenko_sim.add_forcing_to(rod_4).using(
+#     EndpointForces, origin_force, end_force_4, ramp_up_time=ramp_up_time
+# )
+
+# timoshenko_sim.connect(rod_3,rod_4,first_connect_idx=0, second_connect_idx=-1).using(FixedJoint, k=1e5, nu=0, kt=5e3)
 
 timoshenko_sim.finalize()
 
@@ -108,39 +156,39 @@ def analytical_result(arg_rod, arg_end_force, shearing=True, n_elem=500):
     else:
         return arg_s, arg_s ** 2 * quadratic_prefactor + arg_s ** 3 * cubic_prefactor
     
-def plot_timoshenko(rod_1, rod_2, end_force_1, end_force_2):
-    import matplotlib.pyplot as plt
+# def plot_timoshenko(rod_1, rod_2, end_force_1, end_force_2):
+#     import matplotlib.pyplot as plt
     
-    analytical_1_positon = analytical_result(
-        rod_1, end_force_1
-    )
-    analytical_2_positon = analytical_result(
-        rod_2, end_force_2
-    )
+#     analytical_1_positon = analytical_result(
+#         rod_1, end_force_1
+#     )
+#     analytical_2_positon = analytical_result(
+#         rod_2, end_force_2
+#     )
 
-    fig = plt.figure(figsize=(4, 6), frameon=True, dpi=150)
-    ax = fig.add_subplot(111)
-    ax.grid(b=True, which="major", color="grey", linestyle="-", linewidth=0.25)
+#     fig = plt.figure(figsize=(4, 6), frameon=True, dpi=150)
+#     ax = fig.add_subplot(111)
+#     ax.grid(b=True, which="major", color="grey", linestyle="-", linewidth=0.25)
 
-    ax.plot(
-        rod_1.position_collection[1, :],
-        rod_1.position_collection[0, :],
-        "b-",
-        label="Rod 1 n=" + str(rod_1.n_elems),
-    )
-    ax.plot(
-        rod_2.position_collection[1, :],
-        rod_2.position_collection[0, :],
-        "r-",
-        label="Rod 2 n=" + str(rod_2.n_elems),
-    )
+#     ax.plot(
+#         rod_1.position_collection[1, :],
+#         rod_1.position_collection[0, :],
+#         "b-",
+#         label="Rod 1 n=" + str(rod_1.n_elems),
+#     )
+#     ax.plot(
+#         rod_2.position_collection[1, :],
+#         rod_2.position_collection[0, :],
+#         "r-",
+#         label="Rod 2 n=" + str(rod_2.n_elems),
+#     )
 
-    ax.legend(prop={"size": 12})
-    ax.set_ylabel("Z Position (m)", fontsize=12)
-    ax.set_xlabel("X Position (m)", fontsize=12)
-    plt.show()
+#     ax.legend(prop={"size": 12})
+#     ax.set_ylabel("Z Position (m)", fontsize=12)
+#     ax.set_xlabel("X Position (m)", fontsize=12)
+#     plt.show()
 
-plot_timoshenko(rod_1, rod_2, end_force_1, end_force_2)
+# plot_timoshenko(rod_1, rod_2, end_force_1, end_force_2)
 
 def plot_timoshenko(rod_1, rod_2, end_force_1, end_force_2):
     import matplotlib.pyplot as plt
@@ -151,7 +199,15 @@ def plot_timoshenko(rod_1, rod_2, end_force_1, end_force_2):
     analytical_2_positon = analytical_result(
         rod_2, end_force_2, shearing=True
     )
-
+    
+    # analytical_3_positon = analytical_result(
+    #     rod_3, end_force_3, shearing=True
+    # )
+    
+    # analytical_4_positon = analytical_result(
+    #     rod_4, end_force_4, shearing=True
+    # )
+    
     fig = plt.figure(figsize=(6, 4), frameon=True, dpi=150)
     ax = fig.add_subplot(111)
     ax.grid(b=True, which="major", color="grey", linestyle="-", linewidth=0.25)
@@ -169,7 +225,19 @@ def plot_timoshenko(rod_1, rod_2, end_force_1, end_force_2):
         "r-",
         label="Rod 2 n=" + str(rod_2.n_elems),
     )
-
+    # ax.plot(
+    #     rod_3.position_collection[2, :],
+    #     rod_3.position_collection[0, :],
+    #     "y-",
+    #     label="Combined n=" + str(rod_3.n_elems),
+    # )
+    # ax.plot(
+    #     rod_4.position_collection[2, :],
+    #     rod_4.position_collection[0, :],
+    #     "x-",
+    #     label="Combined n=" + str(rod_4.n_elems),
+    # )
+    
     ax.legend(prop={"size": 12})
     ax.set_ylabel("Z Position (m)", fontsize=12)
     ax.set_xlabel("Y Position (m)", fontsize=12)
